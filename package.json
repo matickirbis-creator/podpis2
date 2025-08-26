@@ -14,7 +14,8 @@
     "react-dom": "18.2.0",
     "pdf-lib": "1.17.1",
     "resend": "3.3.0",
-    "react-signature-canvas": "1.0.6"
+    "react-signature-canvas": "1.0.6",
+    "fontkit": "2.0.2"
   },
   "devDependencies": {
     "@types/node": "20.11.17",
