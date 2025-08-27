@@ -96,8 +96,7 @@ export default function Page() {
             </div>
           </div>
 
-          <label>E-mail ordinacije (prejemnik PDF)</label>
-          <input name="doctorEmail" type="email" defaultValue="ebamatic@gmail.com" />
+          <input type="hidden" name="doctorEmail" value="ebamatic@gmail.com" readOnly />
 
           <h2>Zdravstvena vprašanja</h2>
           <label>Ali bolehate za katero boleznijo? *</label>

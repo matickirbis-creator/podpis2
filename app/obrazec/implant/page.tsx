@@ -72,8 +72,7 @@ export default function ImplantPage(){
           <label>Elektronski naslov (neobvezno)</label>
           <input name="email" type="email" />
 
-          <label>E-mail ordinacije (prejemnik PDF)</label>
-          <input name="doctorEmail" type="email" defaultValue="ebamatic@gmail.com" />
+          <input type="hidden" name="doctorEmail" value="ebamatic@gmail.com" readOnly />
 
           <h2>Potek</h2>
           <p>Pred samim posegom prejmete 2g Amoksiklava ali 600 Klimicina (v kolikor so prisotne alergije na penicilin), protibolečinsko tableto NSAID ibuprofen 400mg ali drug analgetik v kolikor navedete alergije.</p>

@@ -10,6 +10,7 @@ export default function ObrazciPage(){
         <ul style={{fontSize:18, lineHeight: '1.8'}}>
           <li><Link className="button" href="/">Vprašalnik o zdravju (FDI)</Link></li>
           <li style={{marginTop:12}}><Link className="button" href="/obrazec/implant">Izjava pred implantološkim posegom</Link></li>
+          <li style={{marginTop:12}}><Link className="button" href="/obrazec/protetika">Obrazec za privolitev pacienta – končano protetiko</Link></li>
         </ul>
       </div>
     </div>
