@@ -59,8 +59,9 @@ export default function ProtetikaPage(){
           <label>Datum dokumenta *</label>
           <input name="docDate" type="text" required placeholder="npr. 7. januar 2019" value={docDate} onChange={(e)=>setDocDate(e.target.value)} />
 
-          <label>Elektronski naslov *</label>
-          <input name="email" type="email" required />
+          <label>Elektronski naslov (neobvezno)</label>
+          <input name="email" type="email" />
+
 
           <label>Ime in priimek *</label>
           <input name="fullName" type="text" required />
