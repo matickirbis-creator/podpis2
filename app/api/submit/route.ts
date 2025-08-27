@@ -43,12 +43,13 @@ export async function POST(req: NextRequest) {
 
     for (const to of recipients) {
       if (!to) continue;
-      const subject = (patientEmail && to.toLowerCase() === patientEmail.toLowerCase())
+      const isPatient = patientEmail && to.toLowerCase() === patientEmail.toLowerCase();
+      const subject = isPatient
         ? 'FDI vprašalnik – vaš izpolnjen obrazec (PDF)'
         : 'FDI vprašalnik – izpolnjen obrazec pacienta (PDF)';
-      const text = (patientEmail && to.toLowerCase() === patientEmail.toLowerCase())
-        ? 'V priponki je vaš izpolnjen obrazec s podpisom. Hvala.'
-        : `V priponki je izpolnjen obrazec pacienta ${fullName}.`;
+      const text = isPatient
+        ? 'V priponki je vaš izpolnjen obrazec s podpisom. Hvala.\n\nLep pozdrav,\nAntonio Koderman.'
+        : `V priponki je izpolnjen obrazec pacienta ${fullName}.\n\nLep pozdrav,\nAntonio Koderman.`;
 
       try {
         const info = await transport.sendMail({

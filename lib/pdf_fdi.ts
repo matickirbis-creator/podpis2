@@ -109,7 +109,7 @@ export async function generatePdfFDI(payload: any): Promise<Uint8Array> {
   if (payload.cigsPerDay) drawKV('Če DA, koliko cigaret na dan', payload.cigsPerDay);
   hr();
 
-  // EXACT statements section
+  // Statements exact text
   drawWrapped('S podpisom potrjujem in se strinjam z naslednjimi izjavami:', boldFont, 13);
   const st = [
     'Pristanem na zobozdravniško zdravljenje ali protetično oskrbo na meni/mojem otroku, kot mi je predložil zobozdravnik.',
@@ -150,7 +150,7 @@ export async function generatePdfFDI(payload: any): Promise<Uint8Array> {
 
   // Timestamp + build marker
   drawWrapped(`Datum in ura oddaje: ${new Date().toLocaleString('sl-SI')}`, regularFont, 11);
-  drawWrapped('Build: v6', regularFont, 9);
+  drawWrapped('Build: latest-smtp', regularFont, 9);
 
   const pdfBytes = await pdfDoc.save();
   return pdfBytes;
