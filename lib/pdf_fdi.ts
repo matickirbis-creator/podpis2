@@ -29,7 +29,7 @@ function wrapText(text: string, font: any, size: number, maxWidth: number) {
   return lines;
 }
 
-export async function generatePdf(payload: any): Promise<Uint8Array> {
+export async function generatePdfFDI(payload: any): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.create();
   pdfDoc.registerFontkit(fontkit);
 
@@ -52,9 +52,9 @@ export async function generatePdf(payload: any): Promise<Uint8Array> {
     }
   };
 
-  const drawText = (text: string, font = regularFont, size = 12) => {
-    const lineWidth = width - margin * 2;
-    const lines = wrapText(String(text ?? ''), font, size, lineWidth);
+  const drawWrapped = (text: string, font: any, size: number) => {
+    const maxWidth = width - margin * 2;
+    const lines = wrapText(text, font, size, maxWidth);
     for (const ln of lines) {
       ensureSpace(size + 8);
       page.drawText(ln, { x: margin, y, size, font, color: rgb(0,0,0)});
@@ -64,7 +64,7 @@ export async function generatePdf(payload: any): Promise<Uint8Array> {
 
   const drawKV = (label: string, value: string, font = regularFont, size = 12) => {
     const labelText = label + (label.endsWith(':') ? '' : ':');
-    drawText(`${labelText} ${value || ''}`, font, size);
+    drawWrapped(`${labelText} ${value || ''}`, font, size);
   };
 
   const hr = () => {
@@ -79,21 +79,16 @@ export async function generatePdf(payload: any): Promise<Uint8Array> {
     const png = await pdfDoc.embedPng(new Uint8Array(logoBytes));
     const logoW = 110;
     const logoH = (png.height / png.width) * logoW;
-    ensureSpace(logoH + 38);
+    ensureSpace(logoH + 40);
     page.drawImage(png, { x: (width - logoW)/2, y: y - logoH, width: logoW, height: logoH });
-    y -= logoH + 10;
-    page.drawText('Vprašalnik o zdravju po priporočilih FDI', { x: margin, y: y - 18, size: 18, font: boldFont });
-    y -= 28;
-  } catch {
-    ensureSpace(40);
-    page.drawText('Vprašalnik o zdravju po priporočilih FDI', { x: margin, y: y - 18, size: 18, font: boldFont });
-    y -= 28;
-  }
+    y -= logoH + 12;
+  } catch {}
+  drawWrapped('Vprašalnik o zdravju po priporočilih FDI', boldFont, 18);
 
   // Basic info
   drawKV('Ime in priimek', payload.fullName);
   drawKV('Email', payload.email);
-  drawKV('Če izpolnjuje druga oseba', payload.proxyName || '');
+  drawKV('Če vprašalnik izpolnjuje druga oseba', payload.proxyName || '');
   drawKV('Spol', payload.gender || '');
   drawKV('Datum rojstva', payload.dob || '');
   drawKV('Kontaktna številka', payload.phone || '');
@@ -114,9 +109,9 @@ export async function generatePdf(payload: any): Promise<Uint8Array> {
   if (payload.cigsPerDay) drawKV('Če DA, koliko cigaret na dan', payload.cigsPerDay);
   hr();
 
-  // Statements: static exact text (no DA/NE)
-  drawText('S podpisom potrjujem in se strinjam z naslednjimi izjavami:', boldFont, 13);
-  const stTexts = [
+  // EXACT statements section
+  drawWrapped('S podpisom potrjujem in se strinjam z naslednjimi izjavami:', boldFont, 13);
+  const st = [
     'Pristanem na zobozdravniško zdravljenje ali protetično oskrbo na meni/mojem otroku, kot mi je predložil zobozdravnik.',
     'Pristanem na anestezijo.',
     'Seznanjen/a sem, da je uspeh posega odvisen od organizma, zobozdravnika, vrste posega in ravnanja bolnika pred/po posegu.',
@@ -126,31 +121,36 @@ export async function generatePdf(payload: any): Promise<Uint8Array> {
     'Izjavljam, da sem v pogovoru z zobozdravnikom dobil/a vse želene informacije o posegu, za katerega sem se prostovoljno odločil/a.',
     'Potrjujem, da sem s polnim razumevanjem in pri polni zavesti, svojevoljno podpisal/a to izjavo.',
   ];
-  for (const t of stTexts) drawText('• ' + t, regularFont, 12);
+  for (const s of st) drawWrapped('• ' + s, regularFont, 12);
   hr();
 
-  // Signature (always visible and fully contained)
-  drawText('Podpis:', boldFont, 13);
+  // Signature
+  drawWrapped('Podpis:', boldFont, 13);
   if (payload.signature && typeof payload.signature === 'string' && payload.signature.startsWith('data:image/')) {
-    // If not enough space, new page first
-    const minHeight = 140; // minimal box for signature
-    ensureSpace(minHeight);
     const base64 = payload.signature.split(',')[1];
     const bytes = Buffer.from(base64, 'base64');
-    const pngImage = await pdfDoc.embedPng(bytes);
+    const png = await pdfDoc.embedPng(bytes);
+
+    // new page if not enough space
+    const minHeight = 140;
+    if (y - minHeight < margin) {
+      page = pdfDoc.addPage([595.28, 841.89]);
+      y = height - margin;
+    }
     const maxW = width - margin * 2;
     const maxH = Math.max(120, y - margin - 20);
-    let w = Math.min(pngImage.width, maxW);
-    let h = (pngImage.height / pngImage.width) * w;
-    if (h > maxH) { h = maxH; w = (pngImage.width / pngImage.height) * h; }
-    page.drawImage(pngImage, { x: margin, y: y - h, width: w, height: h });
+    let w = Math.min(png.width, maxW);
+    let h = (png.height / png.width) * w;
+    if (h > maxH) { h = maxH; w = (png.width / png.height) * h; }
+    page.drawImage(png, { x: margin, y: y - h, width: w, height: h });
     y -= h + 8;
   } else {
-    drawText('(ni podpisa)', regularFont, 12);
+    drawWrapped('(ni podpisa)', regularFont, 12);
   }
 
-  // Timestamp
-  drawText(`Datum in ura oddaje: ${new Date().toLocaleString('sl-SI')}`, regularFont, 11);
+  // Timestamp + build marker
+  drawWrapped(`Datum in ura oddaje: ${new Date().toLocaleString('sl-SI')}`, regularFont, 11);
+  drawWrapped('Build: v6', regularFont, 9);
 
   const pdfBytes = await pdfDoc.save();
   return pdfBytes;

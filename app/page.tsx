@@ -54,10 +54,11 @@ export default function Page(){
   <li>Seznanjen/a sem, da je končni rezultat in učinek posega viden šele po 6–12 mesecih po posegu.</li>
   <li>Pristanem na fotografiranje ali snemanje zaradi medicinske dokumentacije.</li>
   <li>Pristanem na uporabo fotodokumentacije v medicinskoznanstvene, strokovne ali poučne namene, brez razkritja identitete.</li>
-  <li>Izjavljam, da sem v pogovoru s zobozdravnikom dobil/a vse želene informacije o posegu, za katerega sem se prostovoljno odločil/a.</li>
+  <li>Izjavljam, da sem v pogovoru z zobozdravnikom dobil/a vse želene informacije o posegu, za katerega sem se prostovoljno odločil/a.</li>
   <li>Potrjujem, da sem s polnim razumevanjem in pri polni zavesti, svojevoljno podpisal/a to izjavo.</li>
 </ul>
 <h2>Podpis</h2>
+
 
       <SignaturePad value={signature} onChange={setSignature}/>
       <div className="small">S podpisom potrjujem točnost podatkov in soglašam z obdelavo osebnih podatkov za potrebe zobozdravstvenih storitev.</div>

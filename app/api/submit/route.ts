@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generatePdf } from '../../../lib/pdf';
-import { Resend } from 'resend';
+import { generatePdfFDI } from '../../../lib/pdf_fdi';
+import nodemailer from 'nodemailer';
 
 function uniq(emails: string[]): string[] {
   const seen = new Set<string>();
@@ -15,44 +15,57 @@ function uniq(emails: string[]): string[] {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const pdfBytes = await generatePdf(body);
+    const pdfBytes = await generatePdfFDI(body);
 
-    const resendKey = process.env.RESEND_API_KEY;
-    const from = process.env.FROM_EMAIL;
-    if (!resendKey || !from) throw new Error('Manjka RESEND_API_KEY ali FROM_EMAIL.');
+    const smtpUser = process.env.SMTP_USER;
+    const smtpPass = process.env.SMTP_PASS;
+    const fromEmail = process.env.FROM_EMAIL || smtpUser;
+    if (!smtpUser || !smtpPass || !fromEmail) {
+      throw new Error('Manjka SMTP_USER, SMTP_PASS ali FROM_EMAIL.');
+    }
 
-    const resend = new Resend(resendKey);
+    const transport = nodemailer.createTransport({
+      host: process.env.SMTP_HOST || 'smtp.gmail.com',
+      port: Number(process.env.SMTP_PORT || 465),
+      secure: process.env.SMTP_SECURE ? process.env.SMTP_SECURE === 'true' : true,
+      auth: { user: smtpUser, pass: smtpPass },
+    });
 
     const envDoctor = (process.env.DOCTOR_EMAIL || 'ebamatic@gmail.com').trim();
     const formDoctor = String(body.doctorEmail || '').trim();
     const patientEmail = String(body.email || '').trim();
     const fullName = String(body.fullName || '');
     const filename = `obrazec-${Date.now()}.pdf`;
-    const base64 = Buffer.from(pdfBytes).toString('base64');
+    const buffer = Buffer.from(pdfBytes);
 
-    // Build recipient list: env doctor, form doctor, patient (optional)
     const recipients = uniq([envDoctor, formDoctor, patientEmail]);
+    const results: any[] = [];
 
-    const results = [];
     for (const to of recipients) {
       if (!to) continue;
-      const subject = (to.toLowerCase() === patientEmail.toLowerCase())
+      const subject = (patientEmail && to.toLowerCase() === patientEmail.toLowerCase())
         ? 'FDI vprašalnik – vaš izpolnjen obrazec (PDF)'
         : 'FDI vprašalnik – izpolnjen obrazec pacienta (PDF)';
-      const text = (to.toLowerCase() === patientEmail.toLowerCase())
+      const text = (patientEmail && to.toLowerCase() === patientEmail.toLowerCase())
         ? 'V priponki je vaš izpolnjen obrazec s podpisom. Hvala.'
         : `V priponki je izpolnjen obrazec pacienta ${fullName}.`;
 
-      const res: any = await resend.emails.send({
-        from, to, subject, text,
-        attachments: [{ filename, content: base64 }],
-      });
-      results.push({ to, id: res?.id ?? res?.data?.id ?? null, error: res?.error ?? null });
+      try {
+        const info = await transport.sendMail({
+          from: fromEmail,
+          to,
+          subject,
+          text,
+          attachments: [{ filename, content: buffer }],
+        });
+        results.push({ to, messageId: info.messageId, accepted: info.accepted, rejected: info.rejected });
+      } catch (err: any) {
+        results.push({ to, error: String(err?.message || err) });
+      }
     }
 
-    console.log('[EMAIL SEND SUMMARY]', results);
-
-    const allOk = results.every(r => r.id && !r.error);
+    console.log('[SMTP SEND SUMMARY]', results);
+    const allOk = results.every(r => r.accepted && r.accepted.length > 0 && (!r.rejected || r.rejected.length === 0));
     return NextResponse.json({ ok: allOk, recipients: results }, { status: allOk ? 200 : 500 });
   } catch (err: any) {
     console.error('[Submit API] Error:', err);
