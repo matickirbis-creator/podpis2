@@ -1,14 +1,21 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import '../../globals.css';
 import SignaturePad from '../../../components/SignaturePad';
 
 const LOGO_URL = process.env.NEXT_PUBLIC_LOGO_URL || 'https://novapriloznost.si/wp-content/uploads/2023/01/Untitled-design95-150x150.png';
 
 export default function ImplantPage(){
+  const [docDate, setDocDate] = useState('');
   const [loading, setLoading] = useState(false);
   const [signature, setSignature] = useState<string | null>(null);
+
+  useEffect(() => {
+    const now = new Date();
+    const fmt = new Intl.DateTimeFormat('sl-SI', { day: 'numeric', month: 'long', year: 'numeric' }).format(now);
+    setDocDate(fmt);
+  }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -50,7 +57,7 @@ export default function ImplantPage(){
           <p>Spoštovani pacijent/ka, tale obrazec je namenjen temu, da povzamemo kar smo se pogovarjali tekom pregleda in da prostovoljno privolite v poseg, ki je načrtovan.</p>
 
           <label>Datum dokumenta *</label>
-          <input name="docDate" type="text" required placeholder="npr. 7. januar 2019" />
+          <input name="docDate" type="text" required placeholder="npr. 7. januar 2019" value={docDate} onChange={(e)=>setDocDate(e.target.value)} />
 
           <label>Diagnoza *</label>
           <input name="diagnosis" type="text" required />

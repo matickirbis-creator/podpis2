@@ -16,7 +16,7 @@ function UspehContent() {
           : 'Vaš obrazec je podpisan in poslan v ordinacijo.'}
       </p>
       <div style={{ marginTop: 24 }}>
-        <Link href="/" className="button">Izpolni nov obrazec</Link>
+        <Link href="/obrazci" className="button">Izpolni nov obrazec</Link>
       </div>
     </>
   );
