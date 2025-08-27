@@ -43,16 +43,22 @@ export default function Page(){
       <label>Ali ste noseči? (odgovorijo ženske)</label><select name="pregnant"><option value="">Izberi ...</option><option>DA</option><option>NE</option></select>
       <label>Ste kadilec? *</label><select name="smoker" required><option value="">Izberi ...</option><option>DA</option><option>NE</option></select>
       <label>Če "DA" koliko cigaret pokadite na dan?</label><input name="cigsPerDay" type="text"/>
-      <h2>Izjave (opcijsko)</h2>
-      <div className="checkbox"><input type="checkbox" name="stmt1" value="true"/><label>Pristanem na zobozdravniško zdravljenje ali protetično oskrbo na meni/mojem otroku, kot mi je predložil zobozdravnik.</label></div>
-      <div className="checkbox"><input type="checkbox" name="stmt2" value="true"/><label>Pristanem na anestezijo.</label></div>
-      <div className="checkbox"><input type="checkbox" name="stmt3" value="true"/><label>Seznanjen/a sem, da je uspeh posega odvisen od organizma, zobozdravnika, vrste posega in ravnanja bolnika pred/po posegu.</label></div>
-      <div className="checkbox"><input type="checkbox" name="stmt4" value="true"/><label>Seznanjen/a sem, da je končni rezultat in učinek posega viden šele po 6–12 mesecih po posegu.</label></div>
-      <div className="checkbox"><input type="checkbox" name="stmt5" value="true"/><label>Pristanem na fotografiranje ali snemanje zaradi medicinske dokumentacije.</label></div>
-      <div className="checkbox"><input type="checkbox" name="stmt6" value="true"/><label>Pristanem na uporabo fotodokumentacije v medicinskoznanstvene, strokovne ali poučne namene, brez razkritja identitete.</label></div>
-      <div className="checkbox"><input type="checkbox" name="stmt7" value="true"/><label>Izjavljam, da sem v pogovoru z zobozdravnikom dobil/a vse želene informacije o posegu, za katerega sem se prostovoljno odločil/a.</label></div>
-      <div className="checkbox"><input type="checkbox" name="stmt8" value="true"/><label>Potrjujem, da sem s polnim razumevanjem in pri polni zavesti, svojevoljno podpisal/a to izjavo.</label></div>
-      <h2>Podpis</h2>
+      <h2>Izjave</h2>
+<p className="small">
+  S podpisom potrjujem in se strinjam z naslednjimi izjavami:
+</p>
+<ul style={{marginLeft: '18px'}}>
+  <li>Pristanem na zobozdravniško zdravljenje ali protetično oskrbo na meni/mojem otroku, kot mi je predložil zobozdravnik.</li>
+  <li>Pristanem na anestezijo.</li>
+  <li>Seznanjen/a sem, da je uspeh posega odvisen od organizma, zobozdravnika, vrste posega in ravnanja bolnika pred/po posegu.</li>
+  <li>Seznanjen/a sem, da je končni rezultat in učinek posega viden šele po 6–12 mesecih po posegu.</li>
+  <li>Pristanem na fotografiranje ali snemanje zaradi medicinske dokumentacije.</li>
+  <li>Pristanem na uporabo fotodokumentacije v medicinskoznanstvene, strokovne ali poučne namene, brez razkritja identitete.</li>
+  <li>Izjavljam, da sem v pogovoru s zobozdravnikom dobil/a vse želene informacije o posegu, za katerega sem se prostovoljno odločil/a.</li>
+  <li>Potrjujem, da sem s polnim razumevanjem in pri polni zavesti, svojevoljno podpisal/a to izjavo.</li>
+</ul>
+<h2>Podpis</h2>
+
       <SignaturePad value={signature} onChange={setSignature}/>
       <div className="small">S podpisom potrjujem točnost podatkov in soglašam z obdelavo osebnih podatkov za potrebe zobozdravstvenih storitev.</div>
       <div style={{marginTop:16}}><button className="button" type="submit" disabled={loading||!signature}>{loading?'Pošiljanje...':'Oddaj in prejmi PDF na e-mail'}</button></div>
