@@ -1,9 +1,5 @@
-# Ordinacija – PDF s šumniki (UTF-8)
-
-Ta verzija v PDF vgrajuje **Noto Sans** (TTF) preko `fontkit`, zato pravilno prikaže **č, š, ž**.
-Pisave se prenesejo v strežniški funkciji (Vercel) preko HTTP.
-
-### Spreminjanje URL-jev pisav (po želji)
-Lahko dodaš ENV spremenljivki:
-- `FONT_URL_REGULAR` – URL do Regular TTF
-- `FONT_URL_BOLD` – URL do Bold TTF
+# Vprašalnik FDI – obrazec + podpis → PDF → e-mail
+- Logo v UI in PDF
+- Unicode pisava (č,š,ž)
+- Lep prelom besedila v PDF
+ENV: RESEND_API_KEY, FROM_EMAIL, DOCTOR_EMAIL, NEXT_PUBLIC_LOGO_URL, LOGO_URL

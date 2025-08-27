@@ -1,83 +1,24 @@
 import { PDFDocument, rgb } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
-
-const DEFAULT_FONT_REGULAR = process.env.FONT_URL_REGULAR || 'https://raw.githubusercontent.com/googlefonts/noto-fonts/main/hinted/ttf/NotoSans/NotoSans-Regular.ttf';
-const DEFAULT_FONT_BOLD = process.env.FONT_URL_BOLD || 'https://raw.githubusercontent.com/googlefonts/noto-fonts/main/hinted/ttf/NotoSans/NotoSans-Bold.ttf';
-
-async function fetchArrayBuffer(url: string): Promise<ArrayBuffer> {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`Ne morem prenesti pisave: ${url} (${res.status})`);
-  return await res.arrayBuffer();
-}
-
-export async function generatePdf(payload: any): Promise<Uint8Array> {
-  const pdfDoc = await PDFDocument.create();
-  pdfDoc.registerFontkit(fontkit);
-
-  // Naloži Unicode pisavi (Noto Sans) – podpirata šumnike (č,š,ž)
-  const [regularFontBytes, boldFontBytes] = await Promise.all([
-    fetchArrayBuffer(DEFAULT_FONT_REGULAR),
-    fetchArrayBuffer(DEFAULT_FONT_BOLD),
-  ]);
-
-  const regularFont = await pdfDoc.embedFont(new Uint8Array(regularFontBytes), { subset: true });
-  const boldFont = await pdfDoc.embedFont(new Uint8Array(boldFontBytes), { subset: true });
-
-  const page = pdfDoc.addPage([595.28, 841.89]); // A4
-  const { width, height } = page.getSize();
-
-  const margin = 40;
-  let y = height - margin;
-
-  const drawText = (text: string, font = regularFont, size = 12) => {
-    page.drawText(String(text ?? ''), { x: margin, y, size, font, color: rgb(0,0,0)});
-    y -= size + 8;
-  };
-
-  page.drawText('Ordinacija – Izpolnjen obrazec in podpis', { x: margin, y, size: 18, font: boldFont });
-  y -= 28;
-
-  const line = () => {
-    page.drawLine({ start: { x: margin, y }, end: { x: width - margin, y }, thickness: 1, color: rgb(0.8,0.8,0.8) });
-    y -= 16;
-  };
-
-  drawText(`Ime in priimek: ${payload.fullName ?? ''}`);
-  drawText(`E-mail: ${payload.email ?? ''}`);
-  drawText(`Datum rojstva: ${payload.dob ?? ''}`);
-  drawText(`Alergije na zdravila: ${payload.allergies ?? ''}`);
-  drawText(`Redna zdravila: ${payload.medications ?? ''}`);
-  drawText(`Dodatne informacije: ${payload.notes ?? ''}`);
-  line();
-
-  drawText('Izjava:', boldFont);
-  drawText('S podpisom potrjujem točnost navedenih podatkov in soglašam z obdelavo osebnih podatkov za potrebe izvajanja zobozdravstvenih storitev.');
-
-  line();
-  drawText('Podpis:', boldFont);
-
-  if (payload.signature && typeof payload.signature === 'string' && payload.signature.startsWith('data:image/')) {
-    const base64 = payload.signature.split(',')[1];
-    const bytes = Buffer.from(base64, 'base64');
-    const pngImage = await pdfDoc.embedPng(bytes);
-    const pngDims = pngImage.scale(0.5);
-    const sigWidth = Math.min(pngDims.width, width - margin * 2);
-    const scale = sigWidth / pngDims.width;
-    const sigHeight = pngDims.height * scale;
-
-    page.drawImage(pngImage, {
-      x: margin,
-      y: y - sigHeight - 8,
-      width: sigWidth,
-      height: sigHeight,
-    });
-    y -= sigHeight + 24;
-  } else {
-    drawText('(ni podpisa)');
-  }
-
-  drawText(`Datum generiranja: ${new Date().toLocaleString('sl-SI')}`);
-
-  const pdfBytes = await pdfDoc.save();
-  return pdfBytes;
-}
+const DEFAULT_FONT_REGULAR=process.env.FONT_URL_REGULAR||'https://raw.githubusercontent.com/googlefonts/noto-fonts/main/hinted/ttf/NotoSans/NotoSans-Regular.ttf';
+const DEFAULT_FONT_BOLD=process.env.FONT_URL_BOLD||'https://raw.githubusercontent.com/googlefonts/noto-fonts/main/hinted/ttf/NotoSans/NotoSans-Bold.ttf';
+const DEFAULT_LOGO_URL=process.env.LOGO_URL||'https://novapriloznost.si/wp-content/uploads/2023/01/Untitled-design95-150x150.png';
+async function fetchArrayBuffer(url:string){const res=await fetch(url);if(!res.ok) throw new Error(`Ne morem prenesti vira: ${url} (${res.status})`);return await res.arrayBuffer();}
+function wrapText(text:string,font:any,size:number,maxWidth:number){const words=String(text||'').split(/\s+/);const lines:string[]=[];let line='';for(const word of words){const test=line?line+' '+word:word;const w=font.widthOfTextAtSize(test,size);if(w<=maxWidth){line=test}else{if(line) lines.push(line); line=word}} if(line) lines.push(line); return lines}
+export async function generatePdf(payload:any):Promise<Uint8Array>{const pdfDoc=await PDFDocument.create();pdfDoc.registerFontkit(fontkit);const[regularBytes,boldBytes]=await Promise.all([fetchArrayBuffer(DEFAULT_FONT_REGULAR),fetchArrayBuffer(DEFAULT_FONT_BOLD)]);const regularFont=await pdfDoc.embedFont(new Uint8Array(regularBytes),{subset:true});const boldFont=await pdfDoc.embedFont(new Uint8Array(boldBytes),{subset:true});const page=pdfDoc.addPage([595.28,841.89]);const{width,height}=page.getSize();const margin=40;let y=height-margin;try{const logoBytes=await fetchArrayBuffer(DEFAULT_LOGO_URL);const png=await pdfDoc.embedPng(new Uint8Array(logoBytes));const logoW=60;const logoH=(png.height/png.width)*logoW;page.drawImage(png,{x:margin,y:y-logoH,width:logoW,height:logoH});page.drawText('Vprašalnik o zdravju po priporočilih FDI',{x:margin+logoW+12,y:y-18,size:18,font:boldFont});y-=Math.max(logoH,28)+12}catch{page.drawText('Vprašalnik o zdravju po priporočilih FDI',{x:margin,y:y-18,size:18,font:boldFont});y-=40}
+const drawKV=(label:string,value:string,font:any=regularFont,size=12)=>{const labelText=label+(label.endsWith(':')?'':':');const full=`${labelText} ${value||''}`;const lineWidth=width-margin*2;const lines=wrapText(full,font,size,lineWidth);for(const ln of lines){page.drawText(ln,{x:margin,y,size,font,color:rgb(0,0,0)});y-=size+6;}};
+const line=()=>{page.drawLine({start:{x:margin,y},end:{x:width-margin,y},thickness:1,color:rgb(.85,.85,.85)});y-=12};
+// basic
+[ ['Ime in priimek',payload.fullName], ['Email',payload.email], ['Če izpolnjuje druga oseba',payload.proxyName||''], ['Spol',payload.gender||''], ['Datum rojstva',payload.dob||''], ['Kontaktna številka',payload.phone||''], ['Naslov',payload.address||''] ].forEach(([k,v])=>drawKV(String(k),String(v||'')));
+line();
+// health
+[ ['Ali bolehate za katero boleznijo?',payload.hasDisease||''], ['Če DA, katero',payload.diseaseName||''], ['Ali ste bili na operaciji v zadnjih dveh letih?',payload.hadSurgery||''], ['Če DA, na kateri',payload.surgeryName||''], ['Ali jemljete zdravila?',payload.takesMeds||''], ['Katera',payload.medsList||''], ['Ali ste alergični na zdravilo/antibiotik/snov?',payload.hasAllergy||''], ['Če DA, na katero',payload.allergyName||''], ['Ali ste noseči? (ženske)',payload.pregnant||''], ['Ste kadilec?',payload.smoker||''], ['Če DA, koliko cigaret na dan',payload.cigsPerDay||''] ].forEach(([k,v])=>drawKV(String(k),String(v||'')));
+line();
+// statements
+const statements=[['stmt1','Pristanem na zobozdravniško zdravljenje ali protetično oskrbo na meni/mojem otroku, kot mi je predložil zobozdravnik.'],['stmt2','Pristanem na anestezijo.'],['stmt3','Seznanjen/a sem, da je uspeh posega odvisen od organizma, zobozdravnika, vrste posega in ravnanja bolnika pred/po posegu.'],['stmt4','Seznanjen/a sem, da je končni rezultat in učinek posega viden šele po 6–12 mesecih po posegu.'],['stmt5','Pristanem na fotografiranje ali snemanje zaradi medicinske dokumentacije.'],['stmt6','Pristanem na uporabo fotodokumentacije v medicinskoznanstvene, strokovne ali poučne namene, brez razkritja identitete.'],['stmt7','Izjavljam, da sem v pogovoru z zobozdravnikom dobil/a vse želene informacije o posegu, za katerega sem se prostovoljno odločil/a.'],['stmt8','Potrjujem, da sem s polnim razumevanjem in pri polni zavesti, svojevoljno podpisal/a to izjavo.']];
+page.drawText('Izjave (opcijsko):',{x:margin,y,size:13,font:boldFont}); y-=18; const lineWidth=width-margin*2; for(const [key,text] of statements){const checked=payload[key]? 'DA':'NE'; const full=`• ${checked} – ${text}`; const lines=wrapText(full,regularFont,12,lineWidth); for(const ln of lines){page.drawText(ln,{x:margin,y,size:12,font:regularFont,color:rgb(0,0,0)}); y-=18;}}
+line();
+// signature
+page.drawText('Podpis:',{x:margin,y,size:13,font:boldFont}); y-=16; if(payload.signature && typeof payload.signature==='string' && payload.signature.startsWith('data:image/')){const base64=payload.signature.split(',')[1]; const bytes=Buffer.from(base64,'base64'); const png=await pdfDoc.embedPng(bytes); const maxW=width-margin*2; const sigW=Math.min(png.width,maxW); const scale=sigW/png.width; const sigH=png.height*scale; page.drawImage(png,{x:margin,y:y-sigH,width:sigW,height:sigH}); y-=sigH+8}else{page.drawText('(ni podpisa)',{x:margin,y,size:12,font:regularFont}); y-=20}
+const stamp=`Datum in ura oddaje: ${new Date().toLocaleString('sl-SI')}`; page.drawText(stamp,{x:margin,y,size:11,font:regularFont,color:rgb(.2,.2,.2)}); y-=14;
+const pdfBytes=await pdfDoc.save(); return pdfBytes; }
