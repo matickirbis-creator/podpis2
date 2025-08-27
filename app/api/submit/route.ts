@@ -3,6 +3,7 @@ import { generatePdfFDI } from '../../../lib/pdf_fdi';
 import { generatePdfImplant } from '../../../lib/pdf_implant';
 import { generatePdfProtetika } from '../../../lib/pdf_protetika';
 import { generatePdfKirurski } from '../../../lib/pdf_kirurski';
+import { generatePdfEkstrakcija } from '../../../lib/pdf_ekstrakcija';
 import nodemailer from 'nodemailer';
 
 function uniq(emails: string[]): string[] {
@@ -21,6 +22,7 @@ export async function POST(req: NextRequest) {
     const pdfBytes = body?.formType === 'implant' ? await generatePdfImplant(body)
       : body?.formType === 'protetika' ? await generatePdfProtetika(body)
       : body?.formType === 'kirurski' ? await generatePdfKirurski(body)
+      : body?.formType === 'ekstrakcija' ? await generatePdfEkstrakcija(body)
       : await generatePdfFDI(body);
 
     const smtpUser = process.env.SMTP_USER;
@@ -54,10 +56,12 @@ export async function POST(req: NextRequest) {
         ? (body?.formType === 'implant' ? 'Implant – vaš izpolnjen obrazec (PDF)'
           : body?.formType === 'protetika' ? 'Protetika – vaš izpolnjen obrazec (PDF)'
           : body?.formType === 'kirurski' ? 'Kirurški – vaš izpolnjen obrazec (PDF)'
+          : body?.formType === 'ekstrakcija' ? 'Ekstrakcija – vaš izpolnjen obrazec (PDF)'
           : 'FDI vprašalnik – vaš izpolnjen obrazec (PDF)')
         : (body?.formType === 'implant' ? 'Implant – izpolnjen obrazec pacienta (PDF)'
           : body?.formType === 'protetika' ? 'Protetika – izpolnjen obrazec pacienta (PDF)'
           : body?.formType === 'kirurski' ? 'Kirurški – izpolnjen obrazec pacienta (PDF)'
+          : body?.formType === 'ekstrakcija' ? 'Ekstrakcija – izpolnjen obrazec pacienta (PDF)'
           : 'FDI vprašalnik – izpolnjen obrazec pacienta (PDF)');
       const text = isPatient
         ? 'V priponki je vaš izpolnjen obrazec s podpisom. Hvala.\n\nLep pozdrav,\nAntonio Koderman.'
