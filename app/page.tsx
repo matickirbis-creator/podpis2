@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import '../globals.css';
+import './globals.css';
 
 export default function Page(){
   return (
