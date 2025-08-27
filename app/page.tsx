@@ -53,6 +53,9 @@ export default function Page() {
         </div>
 
         <form onSubmit={handleSubmit}>
+          <input type="hidden" name="formType" value="fdi" />
+          <div className="small"><a href="/obrazci">← Nazaj na izbor obrazcev</a></div>
+
           <div className="flex">
             <div style={{ flex: 1 }}>
               <label>Ime in priimek *</label>

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generatePdfFDI } from '../../../lib/pdf_fdi';
+import { generatePdfImplant } from '../../../lib/pdf_implant';
 import nodemailer from 'nodemailer';
 
 function uniq(emails: string[]): string[] {
@@ -15,7 +16,7 @@ function uniq(emails: string[]): string[] {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const pdfBytes = await generatePdfFDI(body);
+    const pdfBytes = body?.formType === 'implant' ? await generatePdfImplant(body) : await generatePdfFDI(body);
 
     const smtpUser = process.env.SMTP_USER;
     const smtpPass = process.env.SMTP_PASS;
@@ -45,8 +46,8 @@ export async function POST(req: NextRequest) {
       if (!to) continue;
       const isPatient = patientEmail && to.toLowerCase() === patientEmail.toLowerCase();
       const subject = isPatient
-        ? 'FDI vprašalnik – vaš izpolnjen obrazec (PDF)'
-        : 'FDI vprašalnik – izpolnjen obrazec pacienta (PDF)';
+        ? (body?.formType === 'implant' ? 'Implant – vaš izpolnjen obrazec (PDF)' : 'FDI vprašalnik – vaš izpolnjen obrazec (PDF)')
+        : (body?.formType === 'implant' ? 'Implant – izpolnjen obrazec pacienta (PDF)' : 'FDI vprašalnik – izpolnjen obrazec pacienta (PDF)');
       const text = isPatient
         ? 'V priponki je vaš izpolnjen obrazec s podpisom. Hvala.\n\nLep pozdrav,\nAntonio Koderman.'
         : `V priponki je izpolnjen obrazec pacienta ${fullName}.\n\nLep pozdrav,\nAntonio Koderman.`;
