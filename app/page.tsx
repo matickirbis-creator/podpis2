@@ -12,6 +12,7 @@ export default function Page(){
           <li><Link className="button" href="/obrazec/implant">Izjava pred implantološkim posegom</Link></li>
           <li><Link className="button" href="/obrazec/protetika">Obrazec za privolitev pacienta – končano protetiko</Link></li>
           <li><Link className="button" href="/obrazec/kirurski">Privolitev v kirurški oralni poseg</Link></li>
+          <li><Link className="button" href="/obrazec/ekstrakcija">Pristanek na ekstrakcijo zoba/obravnavo</Link></li>
         </ul>
       </div>
     </div>
