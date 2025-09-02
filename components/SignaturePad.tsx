@@ -1,39 +1,25 @@
 'use client';
-
 import React, { useRef } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
 
-type Props = {
-  value: string | null;
-  onChange: (dataUrl: string | null) => void;
-};
+type Props = { value: string | null; onChange: (v: string|null)=>void; height?: number };
 
-export default function SignaturePad({ value, onChange }: Props) {
-  const ref = useRef<SignatureCanvas | null>(null);
-
-  const clear = () => {
-    (ref.current as any)?.clear();
-    onChange(null);
+export default function SignaturePad({ value, onChange, height=160 }: Props){
+  const ref = useRef<SignatureCanvas|null>(null);
+  const clear = () => { ref.current?.clear(); onChange(null); };
+  const save = () => {
+    if(ref.current && !ref.current.isEmpty()){
+      onChange(ref.current.toDataURL('image/png'));
+    }
   };
-
-  const handleEnd = () => {
-    const data = (ref.current as any)?.toDataURL('image/png');
-    onChange(data || null);
-  };
-
   return (
     <div>
-      <SignatureCanvas
-        ref={ref as any}
-        penColor="black"
-        backgroundColor="rgba(255,255,255,1)"
-        onEnd={handleEnd}
-        canvasProps={{ className: 'sigpad', width: 700, height: 220 }}
-      />
-      <div style={{ marginTop: 8, display: 'flex', gap: 8 }}>
-        <button type="button" className="button" onClick={clear}>Počisti podpis</button>
+      <div style={{background:'#fff', border:'1px solid #ddd', borderRadius:12, padding:6}}>
+        <SignatureCanvas ref={(c)=>ref.current=c} penColor="black" canvasProps={{width:800,height,style:{width:'100%',height}}} onEnd={save} />
       </div>
-      <div className="small">Podpis zberemo lokalno v brskalniku in pošljemo skupaj z obrazcem.</div>
+      <div className="small">
+        Podpišite se s prstom ali pisalom. <a href="#" onClick={(e)=>{e.preventDefault(); clear();}}>Počisti</a>
+      </div>
     </div>
   );
 }
