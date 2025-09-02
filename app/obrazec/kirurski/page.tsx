@@ -63,9 +63,9 @@ export default function KirurskiPage() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <input type="hidden" name="formType" value="kirurski" />
-          <input type="hidden" name="doctorEmail" value="ebamatic@gmail.com" readOnly />
+        <form autoComplete="off" onSubmit={handleSubmit}>
+          <input type="hidden" name="formType" value="kirurski" / autoComplete="off" />
+          <input type="hidden" name="doctorEmail" value="ebamatic@gmail.com" readOnly / autoComplete="off" />
           <div className="small">
             <a href="/obrazci">← Nazaj na izbor obrazcev</a>
           </div>
@@ -80,24 +80,24 @@ export default function KirurskiPage() {
             required
             placeholder="npr. 7. januar 2019"
             value={procedureDate}
-            onChange={(e) => setProcedureDate(e.target.value)}
+            onChange={(e) = autoComplete="off"> setProcedureDate(e.target.value)}
           />
 
           <label>Vrsta posega *</label>
-          <input name="procedureType" type="text" required />
+          <input name="procedureType" type="text" required / autoComplete="off" />
 
           <h2>Podatki pacienta</h2>
           <label>Ime in priimek *</label>
-          <input name="fullName" type="text" required />
+          <input name="fullName" type="text" required / autoComplete="off" />
 
-          <label>Elektronski naslov (neobvezno)</label>
-          <input name="email" type="email" />
+          <label>Elektronski naslov</label>
+          <input name="email" type="email" / autoComplete="off" />
 
           <label>Datum rojstva *</label>
-          <input name="dob" type="text" required placeholder="DD.MM.LLLL" />
+          <input name="dob" type="text" required placeholder="DD.MM.LLLL" / autoComplete="off" />
 
           <label>Telefonska številka *</label>
-          <input name="phone" type="text" required />
+          <input name="phone" type="text" required / autoComplete="off" />
 
           <h2>1. Opis posega:</h2>
 <p>Vaš zobozdravnik/kirurg vam je razložil naravo predlaganega posega, njegov namen in pričakovane koristi. Ta poseg vključuje:</p>
