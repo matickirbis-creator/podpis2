@@ -5,10 +5,10 @@ import SignatureCanvas from 'react-signature-canvas';
 type Props = { value: string | null; onChange: (v: string|null)=>void; height?: number };
 
 export default function SignaturePad({ value, onChange, height=160 }: Props){
-  const ref = useRef<SignatureCanvas|null>(null);
+  const ref = useRef<any>(null);
   const clear = () => { ref.current?.clear(); onChange(null); };
   const save = () => {
-    if(ref.current && !ref.current.isEmpty()){
+    if(ref.current && typeof ref.current.isEmpty === 'function' && !ref.current.isEmpty()){
       onChange(ref.current.toDataURL('image/png'));
     }
   };
