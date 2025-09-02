@@ -51,7 +51,7 @@ export default function EkstrakcijaPage(){
 
         <form onSubmit={handleSubmit}>
           <input type="hidden" name="formType" value="ekstrakcija" />
-          <input type="hidden" name="doctorEmail" value="ebamatic@gmail.com" readOnly />
+          <input type="hidden" name="doctorEmail" value="kodermanzobozdravstvo@gmail.com" readOnly />
           <div className="small"><a href="/obrazci">← Nazaj na izbor obrazcev</a></div>
 
           <label>Datum *</label>
@@ -71,7 +71,7 @@ export default function EkstrakcijaPage(){
           <label>Ime in priimek *</label>
           <input name="fullName" type="text" required />
 
-          <label>Elektronski naslov (neobvezno)</label>
+          <label>Elektronski naslov </label>
           <input name="email" type="email" />
 
           <label>Datum rojstva *</label>
