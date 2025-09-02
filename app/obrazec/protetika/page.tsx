@@ -51,7 +51,7 @@ export default function ProtetikaPage(){
 
         <form onSubmit={handleSubmit}>
           <input type="hidden" name="formType" value="protetika" />
-          <input type="hidden" name="doctorEmail" value="ebamatic@gmail.com" readOnly />
+          <input type="hidden" name="doctorEmail" value="kodermanzobozdravstvo@gmail.com" readOnly />
           <div className="small"><a href="/obrazci">← Nazaj na izbor obrazcev</a></div>
 
           <p>Spoštovani/a pacient/ka, Zahvaljujemo se vam za zaupanje in sodelovanje pri izdelavi protetičnega nadomestka. Pred zaključkom postopka je pomembno, da ste seznanjeni z določenimi informacijami in podate privolitev za izvedbo protetične obravnave.</p>
@@ -59,7 +59,7 @@ export default function ProtetikaPage(){
           <label>Datum dokumenta *</label>
           <input name="docDate" type="text" required placeholder="npr. 7. januar 2019" value={docDate} onChange={(e)=>setDocDate(e.target.value)} />
 
-          <label>Elektronski naslov (neobvezno)</label>
+          <label>Elektronski naslov </label>
           <input name="email" type="email" />
 
           <label>Ime in priimek *</label>
