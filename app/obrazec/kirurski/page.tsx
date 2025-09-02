@@ -4,16 +4,21 @@ import { useState, useEffect } from 'react';
 import '../../globals.css';
 import SignaturePad from '../../../components/SignaturePad';
 
-const LOGO_URL = process.env.NEXT_PUBLIC_LOGO_URL || 'https://novapriloznost.si/wp-content/uploads/2023/01/Untitled-design95-150x150.png';
+const LOGO_URL =
+  'https://novapriloznost.si/wp-content/uploads/2023/01/Untitled-design95-150x150.png';
 
-export default function KirurskiPage(){
+export default function KirurskiPage() {
   const [loading, setLoading] = useState(false);
   const [signature, setSignature] = useState<string | null>(null);
   const [procedureDate, setProcedureDate] = useState('');
 
   useEffect(() => {
     const now = new Date();
-    const fmt = new Intl.DateTimeFormat('sl-SI', { day: 'numeric', month: 'long', year: 'numeric' }).format(now);
+    const fmt = new Intl.DateTimeFormat('sl-SI', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    }).format(now);
     setProcedureDate(fmt);
   }, []);
 
@@ -24,19 +29,26 @@ export default function KirurskiPage(){
     const data = new FormData(form);
     const payload: any = Object.fromEntries(data.entries());
     payload.signature = signature;
-    try{
-      const res = await fetch('/api/submit', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+    try {
+      const res = await fetch('/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
       const json = await res.json();
-      if(json.ok){
-        const toPatient = !!payload.email && String(payload.email).trim().length > 0;
+      if (json.ok) {
+        const toPatient =
+          !!payload.email && String(payload.email).trim().length > 0;
         form.reset();
-        window.location.href = toPatient ? '/uspeh?patient=1' : '/uspeh?patient=0';
-      }else{
+        window.location.href = toPatient
+          ? '/uspeh?patient=1'
+          : '/uspeh?patient=0';
+      } else {
         alert(json.message || 'Napaka pri pošiljanju.');
       }
-    }catch(err:any){
+    } catch (err: any) {
       alert(err?.message || 'Napaka pri pošiljanju.');
-    }finally{
+    } finally {
       setLoading(false);
     }
   }
@@ -46,19 +58,30 @@ export default function KirurskiPage(){
       <div className="card">
         <div className="header">
           <img className="logo" alt="Logo ordinacije" src={LOGO_URL} />
-          <div><h1>OBRAZEC ZA PRIVOLITEV V KIRURŠKI ORALNI POSEG</h1></div>
+          <div>
+            <h1>OBRAZEC ZA PRIVOLITEV V KIRURŠKI ORALNI POSEG</h1>
+          </div>
         </div>
 
         <form onSubmit={handleSubmit}>
           <input type="hidden" name="formType" value="kirurski" />
           <input type="hidden" name="doctorEmail" value="ebamatic@gmail.com" readOnly />
-          <div className="small"><a href="/obrazci">← Nazaj na izbor obrazcev</a></div>
+          <div className="small">
+            <a href="/obrazci">← Nazaj na izbor obrazcev</a>
+          </div>
 
           <label>Ime in priimek zobozdravnika/kirurga *</label>
           <input name="doctorName" type="text" required />
 
           <label>Datum posega *</label>
-          <input name="procedureDate" type="text" required placeholder="npr. 7. januar 2019" />
+          <input
+            name="procedureDate"
+            type="text"
+            required
+            placeholder="npr. 7. januar 2019"
+            value={procedureDate}
+            onChange={(e) => setProcedureDate(e.target.value)}
+          />
 
           <label>Vrsta posega *</label>
           <input name="procedureType" type="text" required />
@@ -81,7 +104,6 @@ export default function KirurskiPage(){
           <textarea name="procedureDesc" rows={3} placeholder="(opis posega)"></textarea>
 
           <h2>Možna tveganja in zapleti</h2>
-          <p>Med posegom ali po njem lahko pride do naslednjih tveganj in zapletov, o katerih ste bili obveščeni:</p>
           <ul>
             <li>Bolečina, oteklina ali krvavitev</li>
             <li>Okužba</li>
