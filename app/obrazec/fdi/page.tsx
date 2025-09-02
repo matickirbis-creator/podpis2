@@ -47,7 +47,7 @@ export default function FdiFormPage() {
 
         <form onSubmit={handleSubmit}>
           <input type="hidden" name="formType" value="fdi" />
-          <input type="hidden" name="doctorEmail" value="ebamatic@gmail.com" readOnly />
+          <input type="hidden" name="doctorEmail" value="kodermanzobozdravstvo@gmail.com" readOnly />
           <div className="small"><a href="/obrazci">← Nazaj na izbor obrazcev</a></div>
 
           <div className="flex">
@@ -56,7 +56,7 @@ export default function FdiFormPage() {
               <input name="fullName" type="text" required placeholder="Janez Novak" />
             </div>
             <div style={{ flex: 1 }}>
-              <label>Email (neobvezno)</label>
+              <label>Elektronski naslov</label>
               <input name="email" type="email" placeholder="janez@example.com" />
             </div>
           </div>
